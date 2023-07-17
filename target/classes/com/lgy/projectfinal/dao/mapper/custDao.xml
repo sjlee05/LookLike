@@ -1,0 +1,165 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgy.projectfinal.dao.custDao">
+
+    <select id="cust_loginYn" parameterType="String" resultType="com.lgy.projectfinal.dto.custdto">
+        select cust_pwd from customer where cust_id=#{cust_id}
+    </select>
+    
+    <insert id="cust_write" parameterType="hashmap">
+    	insert into customer values((select nvl(max(cust_key)+1,1) from customer),#{cust_name},#{cust_id},#{cust_pwd}
+    								,null,#{cust_addr},#{cust_email},#{cust_phone}
+    								,null,'n',sysdate)
+    </insert>
+<!--     아이디 확인 -->
+    <select id="cust_idCheck" parameterType="String" resultType="com.lgy.projectfinal.dto.custdto">
+        select cust_id from customer WHERE cust_id=#{cust_id}
+    </select>
+
+	<insert id="cust_addCart" parameterType="hashmap">
+	    insert into cart(cust_key, prod_key, cart_count) values(#{cust_key}, #{prod_key}, #{cart_count})
+    </insert>
+    <select id="cust_cartList" parameterType="int" resultType="com.lgy.projectfinal.dto.CartJoinProduct">
+        select c.cust_key, c.prod_key, c.cart_count, p.cat_key, p.prod_name, p.prod_price, p.prod_size, sum(prod_price) over() total_price, p.prod_img, p.prod_imgpath
+		from cart c, product p
+		where c.prod_key = p.prod_key and cust_key=#{cust_key}
+    </select>
+    <insert id="cust_cartDelete" parameterType="int">
+	    delete from cart where cust_key = #{cust_key} and prod_key = #{prod_key}
+    </insert>
+	<insert id="cust_addWish" parameterType="hashmap">
+	    insert into wish(cust_key, prod_key) values(#{cust_key},#{prod_key})
+    </insert>
+    <select id="cust_wishList" parameterType="int" resultType="com.lgy.projectfinal.dto.WishJoinProduct">
+        select w.cust_key, w.prod_key, p.cat_key, p.prod_name, p.prod_price, p.prod_size
+		from wish w, product p
+		where w.prod_key = p.prod_key and cust_key = #{cust_key}
+    </select>
+	<insert id="cust_wishDelete" parameterType="int">
+	    delete from wish where cust_key = #{cust_key} and prod_key = #{prod_key}
+    </insert>
+    <select id="cust_userImport" parameterType="String" resultType="com.lgy.projectfinal.dto.custdto">
+        select * from customer WHERE cust_id=#{cust_id}
+    </select>
+    <select id="cust_qnaList" resultType="com.lgy.projectfinal.dto.QnaJoinProduct">
+        select qna_key, prod_name, qna_title, qna_date, qna_content, qna_img, qna_imgpath, qna_hit, qna_ref, qna_step, qna_level
+		from qna
+		where cust_id = #{cust_id}
+        and (prod_name is null or prod_name is not null)
+    </select>
+    <select id="cust_totalOrder" parameterType="hashmap">
+        insert into totalorder values(
+							        (select nvl(
+									(select decode(
+									(select ord_merchant from totalorder where ord_merchant=#{ord_merchant} and rownum=1),
+									null,
+									(select nvl(max(ord_key)+1,1) from totalorder),
+									(select max(ord_key) from totalorder where ord_merchant=#{ord_merchant})
+									)
+									from totalorder where rownum = 1),1) from dual)
+									,#{cust_id}, 
+        							#{ord_price},#{ord_totalprice}, sysdate, #{prod_name}, #{cust_name},
+                               		'zip', #{cust_addr}, #{cust_addr}, #{cust_phone}, 
+                               		null,#{ord_request},#{ord_count}, '결제완료', 'tnumber', #{ord_merchant})
+    </select>
+    <select id="cust_orderView" parameterType="String" resultType="com.lgy.projectfinal.dto.totalOrderDto">
+        select t.* from totalorder t, customer c
+		where t.cust_id = c.cust_id
+		and c.cust_id = #{cust_id}
+		order by t.ord_key
+    </select>
+    <select id="cust_orderContent" parameterType="String" resultType="com.lgy.projectfinal.dto.totalOrderDto">
+        select * 
+        from totalorder 
+		where ord_merchant = #{ord_merchant}
+    </select>
+    <insert id="cust_naverReg" parameterType="hashmap">
+	    insert into customer(cust_key, cust_name, cust_id, cust_pwd, cust_email) values((select nvl(max(cust_key)+1,1) from customer), #{cust_name}, #{cust_email}, 'naver_pwd', #{cust_email})
+    </insert>
+    <select id="cust_emailCheck" parameterType="String" resultType="com.lgy.projectfinal.dto.custdto">
+        select cust_email from customer WHERE cust_email=#{cust_email}
+    </select>
+    <update id="cust_payCancelStatus" parameterType="String">
+    	 update totalorder set ord_status = '환불요청중' where ord_merchant = #{ord_merchant}
+    </update>
+    <update id="cust_payCancelSuccess" parameterType="String">
+    	 update totalorder set ord_status = '환불완료' where ord_merchant = #{ord_merchant}
+    </update>
+    <update id="cust_phoneUpdate" parameterType="String">
+    	 update customer set cust_phone = #{cust_phone} where cust_key = #{cust_key} 
+    </update>
+    <update id="cust_addrUpdate" parameterType="String">
+    	 update customer set cust_addr = #{cust_addr} where cust_key = #{cust_key} 
+    </update>
+    <update id="cust_countdown" parameterType="map">
+    	update product 
+    	set prod_cnt = prod_cnt - #{ord_count}
+    	where prod_name = #{prod_name}
+    </update>
+    <update id="cust_countBack" parameterType="String">
+    	UPDATE product SET prod_cnt = prod_cnt + (
+		  SELECT SUM(ord_count)
+		  FROM totalorder
+		  WHERE prod_name = ord_item AND ord_merchant = #{ord_merchant}
+		  GROUP BY ord_item
+		)
+		WHERE prod_name IN (
+		  SELECT ord_item
+		  FROM totalorder
+		  WHERE ord_merchant = #{ord_merchant}
+		)
+    </update>
+    <insert id="cust_kakaoReg" parameterType="hashmap">
+	    insert into customer(cust_key, cust_name, cust_id, cust_pwd, cust_email) values((select nvl(max(cust_key)+1,1) from customer), #{cust_name}, #{cust_email}, 'kakao_pwd', #{cust_email})
+    </insert>
+    <select id="cust_pwdCheck" parameterType="String" resultType="String">
+    	select cust_pwd from customer where cust_email = #{cust_email}
+    </select>
+    
+    <select id="cust_pwFind" parameterType="String" resultType="String">
+        select cust_email from customer WHERE cust_id=#{cust_id} AND cust_email=#{cust_email}
+    </select>
+    <update id="changePassword" parameterType="String">
+    	update customer set cust_pwd = #{cust_pwd} where cust_email = #{cust_email}
+    </update>
+    <insert id="cust_userDelete" parameterType="String">
+	    delete from customer where cust_id = #{cust_id}
+    </insert>
+    <update id="cust_userUpdate" parameterType="hashmap">
+    	 update customer 
+    	 set cust_name=#{cust_name},
+    	 cust_pwd=#{cust_pwd},
+    	 cust_email=#{cust_email},
+    	 cust_phone=#{cust_phone},
+    	 cust_tel=#{cust_tel},
+    	 cust_addr=#{cust_addr}
+    	 where cust_id=#{cust_id}
+    </update>
+    
+    <select id="cust_idFind" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.custdto">
+        select cust_id from customer WHERE cust_name=#{cust_name} AND cust_email=#{cust_email}
+    </select>
+    
+     <update id="cust_delivery" parameterType="String">
+    	 update totalorder set ord_status = '배송중' where ord_merchant = #{ord_merchant}
+    </update>
+    <update id="cust_deliverycheck" parameterType="String">
+    	 update totalorder set ord_status = '배송완료' where ord_merchant = #{ord_merchant}
+    </update>
+    <select id="cust_myPageCount"  parameterType="String" resultType="com.lgy.projectfinal.dto.myPageCountDto">
+    	SELECT 
+		  (SELECT COUNT(*) FROM totalorder WHERE cust_id = #{cust_id} AND ord_status='배송중') a,
+		  (SELECT COUNT(*) FROM totalorder WHERE cust_id = #{cust_id} AND ord_status='배송완료') b,
+		  (SELECT COUNT(*) FROM totalorder WHERE cust_id = #{cust_id} AND ord_status='환불 요청중') c,
+		  (SELECT COUNT(*) FROM totalorder WHERE cust_id = #{cust_id} AND ord_status='환불완료') d
+		FROM dual
+    </select>
+    <update id="cust_cartCountUpdate" parameterType="String">
+    	update cart set cart_count = #{cart_count} where prod_key = #{prod_key}
+    </update>
+</mapper>
+
+
+

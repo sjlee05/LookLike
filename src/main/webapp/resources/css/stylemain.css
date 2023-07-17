@@ -1,0 +1,52 @@
+.logo{
+    padding: 3px;
+    text-align: center;
+}
+header img{
+    width: 800px;
+    margin: 0 auto;
+}
+section{
+    background-color: white;
+}
+.section-div{
+    margin: 0 auto; padding: 0;
+    width: 100%;
+    overflow: hidden;
+}
+a{
+    text-decoration: none;
+    color: black;
+}
+
+.header-div{
+    width: 100%;
+    height: 80%;
+    margin: 0 auto;
+    position: fixed;
+    margin-top: 30px;
+    z-index: -1;
+}
+.img_slider li{
+    left: -30px;
+}
+.img_slider li img{
+    margin: 0 auto;
+    width: 500px;
+    height: 700px;
+    padding: 50px;
+}
+.content_img_list{
+    margin-top: 200px;
+    margin: auto;
+    text-align: center;
+    width: 1300px;
+}
+.content_img{
+    display: inline-block;
+    padding: 20px;
+    width: 30%;
+}
+.content_img img{
+    height: 500px;
+}

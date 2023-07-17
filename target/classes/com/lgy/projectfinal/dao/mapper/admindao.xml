@@ -1,0 +1,59 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.lgy.projectfinal.dao.admindao">
+    
+    <select id="admin_search" resultType="com.lgy.projectfinal.dto.custdto">
+        select * from customer where cust_id like  '%'||#{param1}||'%'
+    </select>
+    
+    <select id="admin_searchmanager" resultType="com.lgy.projectfinal.dto.admindto">
+        select * from admin where ad_id like  '%'||#{param1}||'%'
+    </select>
+
+	<select id="admin_list" resultType="com.lgy.projectfinal.dto.custdto">
+<!-- order by bid desc : where rownum 뒤에 정렬 조건 추가해서 최신순 -->
+    	<![CDATA[
+			SELECT cust_key,cust_name,cust_id,cust_pwd,cust_gender,cust_addr,cust_email,cust_phone,cust_tel,cust_signout
+			from (SELECT rownum rn, cust_key,cust_name,cust_id,cust_pwd,cust_gender,cust_addr,cust_email,cust_phone,cust_tel,cust_signout 
+			              FROM customer
+			            WHERE ROWNUM <= (#{pageNum} * #{amount})
+			)
+			WHERE rn > (#{pageNum}-1) * #{amount}
+		]]>
+    </select>
+   
+    <select id="admin_managerlistWithPaging" resultType="com.lgy.projectfinal.dto.admindto">
+		select * from admin
+    </select>
+    
+    <select id="admin_contentView" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.admindto">
+        select * from admin where ad_id=#{ad_id}
+    </select>
+    
+    <select id="admin_getTotalCount" resultType="int">
+		SELECT count(*) FROM customer
+    </select>
+    
+     <insert id="admin_registerOk" parameterType="hashmap">
+    insert into admin(ad_key,ad_id,ad_pwd,ad_name,ad_auth) values
+    						(ADMIN_SEQ.NEXTVAL,#{ad_id},#{ad_pwd},#{ad_name},default)
+    </insert>
+    
+    <select id="admin_loginYn" parameterType="String" resultType="com.lgy.projectfinal.dto.admindto">
+        select ad_pwd from admin where ad_id=#{ad_id}
+    </select>
+    
+    <update id="admin_modify" parameterType="hashmap">
+   		update admin set ad_pwd = #{ad_pwd}, ad_auth = #{ad_auth} where ad_id=#{ad_id}
+    </update>
+    
+    <delete id="admin_delete" parameterType="hashmap">
+   		delete from admin where ad_id=#{ad_id}
+    </delete>
+
+    <select id="admin_getAdAuthByAdId" parameterType="java.lang.String" resultType="java.lang.Integer">
+    SELECT ad_auth FROM admin WHERE ad_id = #{ad_id}
+</select>
+</mapper>

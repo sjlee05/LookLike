@@ -1,0 +1,119 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgy.projectfinal.dao.ReviewDao">
+
+    <sql id="criteria">
+        <trim prefix="AND (" suffix=")" prefixOverrides="OR">
+            <foreach collection="typeArr" item="type">
+                <trim prefix="OR">
+                    <choose>
+                        <when test="type == 'T'.toString()">
+                            rev_title like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'C'.toString()">
+                            rev_content like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'W'.toString()">
+                            cust_id like '%'||#{keyword}||'%' 
+                        </when>
+                    </choose>
+                </trim>
+            </foreach>
+        </trim>
+    </sql>
+   
+				     
+	<select id="review_listWithPaging" resultType="com.lgy.projectfinal.dto.ReviewDto">
+	    <![CDATA[ 
+	    SELECT rev_key, prod_name, cust_id, ad_id, rev_title, rev_content, rev_date, rev_ref, rev_step, rev_level
+	    FROM (
+	        SELECT rownum rn, rev_key, prod_name, cust_id, ad_id, rev_title, rev_content, rev_date, rev_ref, rev_step, rev_level
+		    FROM (
+		        SELECT rownum rn, rev_key, prod_name, cust_id, ad_id, rev_title, rev_content, rev_date, rev_ref, rev_step, rev_level
+		        FROM review 
+		        order by rev_ref desc, rev_step asc
+		        )
+		        where rownum <= (#{pageNum} * #{amount})
+	    ]]>            
+	        <if test="keyword != null">
+	            <include refid="criteria"></include> 
+	        </if>
+	    <![CDATA[
+	        )
+	    where rn > (#{pageNum} - 1) * #{amount}
+	    order by rev_ref desc, rev_step asc
+	    ]]>
+	</select>
+	
+	<insert id="review_write" parameterType="hashmap">
+	    <selectKey keyProperty="rev_key" resultType="int" order="BEFORE">
+	        SELECT review_SEQ.NEXTVAL FROM dual
+	    </selectKey>
+	    INSERT INTO review (rev_key, rev_ref, rev_title, cust_id, rev_img, rev_imgpath, rev_content, prod_name, rev_rate) VALUES
+	                    (#{rev_key}, #{rev_key}, #{rev_title}, #{cust_id}, #{saveFileNames}, #{saveFilePaths}, #{rev_content}, #{prod_name}, #{rev_rate})
+	</insert>
+	
+        <select id="review_contentView" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.ReviewDto">
+         SELECT rev_key, rev_ref, rev_step, rev_level, rev_title, cust_id, ad_id, rev_img, rev_imgpath, rev_date, rev_content, rev_rate, prod_name
+		    FROM review
+		    WHERE rev_key = #{rev_key} 
+    </select>
+
+    <select id="review_getImagePath" resultType="String" >
+        SELECT rev_imgpath FROM review WHERE rev_key = #{rev_key}
+    </select>
+    
+    <update id="review_modify" parameterType="hashmap">
+   	 	update review set rev_title = #{rev_title}, rev_content = #{rev_content}, rev_rate = #{rev_rate, jdbcType=INTEGER}
+	        <if test="saveFileNames != null">
+	            , rev_img = #{saveFileNames, jdbcType=VARCHAR}
+	        </if>
+	        <if test="saveFilePaths != null">
+	            , rev_imgpath = #{saveFilePaths, jdbcType=VARCHAR}
+	        </if>
+	         where rev_key = #{rev_key}
+    </update>
+    
+    <delete id="review_delete" parameterType="hashmap">
+   	 	delete from review where rev_key=#{rev_key}
+    </delete>
+    
+    <select id="review_getTotalCount" resultType="int">
+		SELECT count(*) FROM review
+		<if test="keyword != null">
+            where rev_key > 0 <include refid="criteria"></include>
+        </if>
+    </select>
+    
+
+<!-- 같은 REF(최상위부모값)을 가진 것 중 현재 답글을 달 게시물의 순번보다 큰것을 +1로 하여 하나씩 밀리게한다 -->
+	<!-- 등록 전 요소 업데이트 -->
+	<update id="review_updateStep" parameterType="hashmap">
+		UPDATE review SET rev_step = rev_step+1 WHERE rev_ref = #{rev_ref} AND rev_step > #{rev_step}
+	</update>
+		<!-- 답글의 입력 -->
+	<insert id="review_reply" parameterType="hashmap">
+<!-- 	ad_key 추가하기 -->
+		INSERT INTO review(
+				rev_key, rev_ref, rev_step, rev_level, rev_title, rev_content, rev_img, rev_imgpath, prod_name, ad_id) 
+		VALUES (
+				review_SEQ.NEXTVAL, #{rev_ref}, #{rev_step}+1, #{rev_level}+1, #{rev_title}, #{rev_content}, #{saveFileNames, jdbcType=VARCHAR}, #{saveFilePaths, jdbcType=VARCHAR}, #{prod_name}, #{ad_id}
+			  )
+	</insert>
+	
+	 <update id="review_deleteFile" parameterType="hashmap">
+   		update review set rev_img = #{saveFileNames, jdbcType=VARCHAR}
+	        		     , rev_imgPath = #{saveFilePaths, jdbcType=VARCHAR}
+   				where rev_key=#{rev_key}
+    </update>
+    
+    <update id="review_rating" parameterType="hashmap">
+    	<selectKey keyProperty="prod_rating" resultType="int" order="BEFORE">
+			select round(sum(rev_rate)/count(prod_name),0) from review where prod_name=#{prod_name}
+	    </selectKey>
+    	update product set prod_rating = #{prod_rating} where prod_name=#{prod_name}
+    </update>
+</mapper>
+

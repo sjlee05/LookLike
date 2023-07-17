@@ -1,0 +1,95 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgy.projectfinal.dao.NoticeDao">
+
+    <sql id="criteria">
+        <trim prefix="AND (" suffix=")" prefixOverrides="OR">
+            <foreach collection="typeArr" item="type">
+                <trim prefix="OR">
+                    <choose>
+                        <when test="type == 'T'.toString()">
+                            not_title like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'C'.toString()">
+                            not_content like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'W'.toString()">
+                            ad_id like '%'||#{keyword}||'%' 
+                        </when>
+                    </choose>
+                </trim>
+            </foreach>
+        </trim>
+    </sql>
+
+   <select id="notice_listWithPaging" resultType="com.lgy.projectfinal.dto.NoticeDto">
+     <![CDATA[ 
+		SELECT not_key, ad_id, not_title, not_content, not_date, not_hit 
+		from (
+		    SELECT rownum rn, not_key, ad_id, not_title, not_content, not_date, not_hit 
+			from (
+			    SELECT rownum rn, not_key, ad_id, not_title, not_content, not_date, not_hit 
+			    FROM NOTICE
+			    order by not_key desc
+			   )
+			    where rownum <= (#{pageNum} * #{amount})
+    ]]>            
+                <if test="keyword != null">
+                     <include refid="criteria"></include> 
+                </if>
+    
+    <![CDATA[
+                )
+        where rn > (#{pageNum} -1) * #{amount}
+        order by not_key desc
+    ]]>
+    </select>
+    <insert id="notice_write" parameterType="hashmap">
+   	 	insert into notice(not_key, not_title, ad_id, not_img, not_imgpath, not_content) values
+   	 					(notice_seq.NEXTVAL, #{not_title} ,#{ad_id},#{saveFileNames}, #{saveFilePaths}, #{not_content, jdbcType=VARCHAR})
+    </insert>
+        <select id="notice_contentView" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.NoticeDto">
+      	select not_key, not_title, ad_id, not_img, not_imgpath, not_hit, not_date, not_content from notice where not_key=#{not_key}
+    </select>
+
+    <select id="notice_getImagePath" resultType="String" >
+        SELECT not_imgpath FROM notice WHERE not_key = #{not_key}
+    </select>
+    
+	<update id="notice_modify" parameterType="hashmap">
+	    <trim prefix="update notice set" suffixOverrides=",">
+	        not_title = #{not_title},
+	        not_content = #{not_content}
+	        <if test="saveFileNames != null">
+	            , not_img = #{saveFileNames, jdbcType=VARCHAR}
+	        </if>
+	        <if test="saveFilePaths != null">
+	            , not_imgpath = #{saveFilePaths, jdbcType=VARCHAR}
+	        </if>
+	    </trim>
+	    where not_key = #{not_key}
+	</update>
+    
+    <delete id="notice_delete" parameterType="hashmap">
+   	 	delete from notice where not_key=#{not_key}
+    </delete>
+    
+    <select id="notice_getTotalCount" resultType="int">
+		SELECT count(*) FROM notice
+		<if test="keyword != null">
+            where not_key > 0 <include refid="criteria"></include>
+        </if>
+    </select>
+    
+    <update id="notice_upHit" parameterType="hashmap">
+		update notice set not_hit = not_hit+1 where not_key=#{not_key}
+    </update>
+    
+	 <update id="notice_deleteFile" parameterType="hashmap">
+   		update notice set not_img = #{saveFileNames, jdbcType=VARCHAR}
+	        		     , not_imgPath = #{saveFilePaths, jdbcType=VARCHAR}
+   				where not_key=#{not_key}
+    </update>
+</mapper>

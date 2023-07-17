@@ -1,0 +1,79 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgy.projectfinal.dao.SaleDao">
+
+    <sql id="criteria">
+			<if test='startDt != null and startDt != "" and endDt != null and endDt != ""'>
+<!-- 			+1을 하는 이유 : 2023-02-15 00.00.00.0 ~ 2023-02-16 00.00.00.0  -->
+			    AND ord_date BETWEEN TO_DATE(#{startDt}) AND TO_DATE(#{endDt}) +1
+			</if>
+    </sql>
+    
+     <select id="sale_listWithPaging" resultType="com.lgy.projectfinal.dto.SaleDto">
+     <![CDATA[ 
+ 		SELECT ord_key, cust_id, ord_name, ord_date, ord_totalprice, ord_status, ord_item,ord_merchant
+ 		from ( 
+ 		    SELECT rownum rn, ord_key, cust_id, ord_name, ord_date, ord_totalprice, ord_status , ord_item ,ord_merchant
+	 		from ( 
+	 		    SELECT rownum rn, ord_key, cust_id, ord_name, ord_date, ord_totalprice, ord_status , ord_item ,ord_merchant
+	 		    FROM totalorder
+	 		    order by ord_key desc
+	 		    )
+	 		    where rownum <= (#{pageNum} * #{amount})
+     ]]>             
+		    <if test="startDt != null">
+		      <include refid="criteria"></include> 
+		    </if>
+    
+    <![CDATA[
+                 ) 
+         where rn > (#{pageNum} -1) * #{amount} 
+         order by ord_key desc 
+     ]]> 
+    </select>
+    
+
+	
+     <select id="sale_contentView" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.SaleDto">
+      	select ord_key, cust_id, ord_name, ord_date, ord_totalprice
+      	, ord_price, ord_count, ord_item, ord_addr, ord_addrdetail, ord_zipcode, ord_tel, ord_phone, ord_tnumber
+      	,ord_request from totalorder where ord_key = #{ord_key}
+    </select>
+
+	<update id="sale_modify" parameterType="hashmap">
+		update totalorder set 
+  	 	ord_addr = #{ord_addr}
+  	 	, ord_addrdetail = #{ord_addrdetail}
+  	 	, ord_zipcode = #{ord_zipcode}
+  	 	, ord_tel = #{ord_tel, jdbcType=VARCHAR}
+  	 	, ord_phone = #{ord_phone}
+  	 	, ord_request = #{ord_request, jdbcType=VARCHAR}
+  	 	where ord_key = #{ord_key}	
+	</update>
+	
+	
+	<update id="sale_modifySales" parameterType="hashmap">
+		update totalorder set ord_price = #{ord_price}
+  	 						, ord_count = #{ord_count}
+  	 				where ord_key = #{ord_key} and ord_item = #{ord_item}
+	</update>
+    
+    
+    <delete id="sale_delete" parameterType="hashmap">
+   	 	delete from totalorder where ord_key=#{ord_key}
+    </delete>
+    
+    <select id="sale_getTotalCount" resultType="int">
+		SELECT count(*) FROM totalorder
+		<if test="keyword != null">
+            where ord_key > 0 <include refid="criteria"></include>
+        </if>
+    </select>
+    
+     <select id="sale_getSales" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.SaleDto">
+      	select ord_price, ord_count, ord_item 
+      	from totalorder where ord_key = #{ord_key}
+    </select>
+</mapper>

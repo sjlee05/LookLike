@@ -1,0 +1,168 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lgy.projectfinal.dao.prodDao">
+  <sql id="criteria">
+        <trim prefix="AND (" suffix=")" prefixOverrides="OR">
+            <foreach collection="typeArr" item="type">
+                <trim prefix="OR">
+                    <choose>
+                        <when test="type == 'T'.toString()">
+                            qna_title like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'C'.toString()">
+                            qna_content like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'W'.toString()">
+                            cust_id like '%'||#{keyword}||'%' 
+                        </when>
+                    </choose>
+                </trim>
+            </foreach>
+        </trim>
+    </sql>
+
+
+<!-- 	 관리자 상품등록 db -->
+	 <insert id="prod_write" parameterType="hashmap">
+	  	insert into product(prod_key,cat_key,prod_name,prod_img,prod_imgPath,prod_thumbnail,prod_thumbnailPath,prod_content,prod_price,prod_rdate,prod_cnt,prod_size)
+	  			values(PRODUCT_SEQ.NEXTVAL,#{cat_key},#{prod_name},#{save_prodImg},#{save_prodImgPath}
+	  			,#{save_prod_thumbnail},#{save_prod_thumbnailPath},#{prod_content},#{prod_price}
+	  			,#{prod_rdate},#{prod_cnt},#{prod_size})
+    </insert>
+    
+<!--     관리자 상세페이지 db -->
+    <select id="prod_contentView" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.prodDto">
+    	select * from product where prod_key=#{prod_key}
+    </select>
+    
+<!--     회원 상세페이지 db -->
+    <select id="prod_member_contentview" parameterType="hashmap" resultType="com.lgy.projectfinal.dto.prodDto">
+    	select * from product where prod_key=#{prod_key}
+    </select>
+    
+<!--   	관리자 상품목록 검색기능 db -->
+    <select id="prod_search" resultType="com.lgy.projectfinal.dto.prodDto">
+        select * from product where prod_name like  '%'||#{param1}||'%'
+    </select>
+    
+    <select id="prod_member_search" resultType="com.lgy.projectfinal.dto.prodDto">
+        select * from product where prod_name like  '%'||#{param1}||'%'
+    </select>
+    
+<!--     관리자 상품수정 db -->
+    <update id="prod_modify" parameterType="hashmap">
+   		update product set prod_name = #{prod_name}
+   						 , prod_content = #{prod_content}
+   						 , prod_price = #{prod_price}
+   						 , prod_cnt = #{prod_cnt}
+   						 , prod_size = #{prod_size}
+ 					<if test="save_prodImg != null">
+ 						, prod_img = #{save_prodImg}, prod_thumbnail = #{save_prod_thumbnail}
+ 					</if>
+ 					<if test="save_prodImgPath != null">
+ 						, prod_imgPath = #{save_prodImgPath}, prod_thumbnailPath = #{save_prod_thumbnailPath}
+ 					</if>
+   						 where prod_key=#{prod_key}
+    </update>
+    
+<!--     관리자 상품삭제 db -->
+    <delete id="prod_delete" parameterType="hashmap">
+    	delete from product where prod_key=#{prod_key}
+    </delete>
+    
+<!--     관리자 업로드 된 파일 삭제 db -->
+        <update id="prod_deleteFile" parameterType="hashmap">
+   		update product set prod_img = #{save_prodImg}
+	        		     , prod_imgPath = #{save_prodImgPath}
+   						 , prod_thumbnail = #{save_prod_thumbnail}
+	        		     , prod_thumbnailPath = #{save_prod_thumbnailPath}
+   				where prod_key=#{prod_key}
+    </update>
+	
+<!--     페이징 처리 메소드 -->
+    <select id="prod_getTotalCount" resultType="int">
+    	select count(*)from product
+    </select>
+    
+    <select id="prod_getTotalCount_top" resultType="int">
+    	select count(*) from product where cat_key=1 
+    </select>
+
+    <select id="prod_list" resultType="com.lgy.projectfinal.dto.prodDto">
+			<![CDATA[
+					SELECT prod_key, cat_key, prod_name, prod_img, prod_thumbnailPath, prod_content, prod_price, prod_cnt, prod_rdate, prod_size
+				FROM (
+				    SELECT rownum rn, prod_key, cat_key, prod_name, prod_img, prod_thumbnailPath, prod_content, prod_price, prod_cnt, prod_rdate, prod_size
+				    FROM (
+				        SELECT prod_key, cat_key, prod_name, prod_img, prod_thumbnailPath, prod_content, prod_price, prod_cnt, prod_rdate, prod_size
+				        FROM product
+				        ORDER BY prod_key DESC
+				    )
+				    WHERE rownum <= (#{pageNum} * #{amount})
+				)
+				WHERE rn > (#{pageNum} - 1) * #{amount}
+				ORDER BY prod_key desc
+			]]>
+    </select>
+    
+	<select id="prod_main_list" resultType="com.lgy.projectfinal.dto.prodDto">
+   			 select * from product
+    </select>  
+    
+     <select id="prod_member_TopList" resultType="com.lgy.projectfinal.dto.prodDto">
+    <![CDATA[
+    SELECT prod_key, cat_key, prod_name, prod_img, prod_imgPath, prod_content, prod_price, prod_cnt, prod_rdate, prod_size
+    FROM (
+        SELECT rownum rn, prod_key, cat_key, prod_name, prod_img, prod_imgPath, prod_content, prod_price, prod_cnt, prod_rdate, prod_size
+        FROM (
+            SELECT prod_key, cat_key, prod_name, prod_img, prod_imgPath, prod_content, prod_price, prod_cnt, prod_rdate, prod_size
+            FROM product
+        ]]>
+        <if test="keyword != null">
+            WHERE prod_name LIKE '%'||#{keyword}||'%'
+        </if>
+        <![CDATA[
+            ORDER BY prod_key DESC
+        )
+        WHERE rownum <= (#{pageNum} * #{amount})
+    )
+    WHERE rn > (#{pageNum} - 1) * #{amount}
+    and cat_key = 1
+    ORDER BY prod_key DESC
+    ]]>
+	</select>
+
+	<select id="prod_categoryList" resultType="com.lgy.projectfinal.dto.CategoryDto">
+		select * from category where length(cat_key) = 2
+	</select>
+	<select id="prod_categorySearch" resultType="com.lgy.projectfinal.dto.prodDto">
+		select * from product where cat_key = #{cat_key}
+	</select>
+	<select id="prod_categoryTotalSearch" resultType="com.lgy.projectfinal.dto.prodDto">
+		select * from product where cat_key like #{cat_key}||'%' and length(cat_key) = 2
+	</select>
+	<select id="qna_listWithPaging" resultType="com.lgy.projectfinal.dto.QnADto">
+     <![CDATA[ 
+		SELECT qna_key, cust_id, ad_id, qna_title, qna_content, qna_date, qna_hit, qna_ref, qna_step, qna_level
+		from (
+		    SELECT rownum rn, qna_key, cust_id, ad_id, qna_title, qna_content, qna_date, qna_hit, qna_ref, qna_step, qna_level
+		    from (
+			    SELECT rownum rn, qna_key, cust_id, ad_id, qna_title, qna_content, qna_date, qna_hit, qna_ref, qna_step, qna_level
+			    FROM qna
+			    order by qna_ref desc, qna_step asc
+			   )
+			    where rownum <= (#{pageNum} * #{amount})
+    ]]>            
+                <if test="keyword != null">
+                     <include refid="criteria"></include> 
+                </if>
+    
+    <![CDATA[
+                )
+        where rn > (#{pageNum} -1) * #{amount}
+        order by qna_ref desc, qna_step asc
+    ]]>
+    </select>
+</mapper>

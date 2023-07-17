@@ -1,0 +1,28 @@
+@charset "UTF-8";
+.login-a{
+	position: relative;
+/* 	z-index:8888; */
+}
+.login-btn{
+	background-color: gray;
+	position: fixed;
+	top: 150px; right: 40px;
+	width: 80px; height: 80px;
+	border-radius: 40px;
+		font-size: 20px;
+		white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	z-index:8888;
+	cursor: pointer;
+}
+.modal-btn{
+	background-color: lightblue;
+	position: fixed;
+	top: 270px; right: 40px;
+	width: 80px; height: 80px;
+	border-radius: 40px;
+	z-index:8888;
+	cursor: pointer;
+}
