@@ -78,10 +78,10 @@
     : 이미지는 D:\dev\looklike 폴더에 저장합니다.
 
    + **ProdService**   
-    : ProdService.java - [ProdServiceImpl.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/service/prodserviceImpl.java)의 구조를 가집니다.
+    : ProdService.java - [ProdServiceImpl.java](./src/main/java/com/lgy/projectfinal/service/prodserviceImpl.java)의 구조를 가집니다.
 
    + **ProdDao**   
-    : [ProdDao.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/prodDao.java) - [ProdMapper.xml](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/mapper/prodDao.xml)의 구조를 가집니다.
+    : [ProdDao.java](./src/main/java/com/lgy/projectfinal/dao/prodDao.java) - [ProdMapper.xml](./src/main/java/com/lgy/projectfinal/dao/mapper/prodDao.xml)의 구조를 가집니다.
  
   </details>
 
@@ -111,20 +111,20 @@
     **[ 상세 구조 ]**
    <img src = "https://github.com/sjlee05/LookLike/assets/136719054/da2caa23-2eac-4385-a232-2b9428e36e9e.png" width ="900px"/>
 
-    + **[SaleController](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/controller/SaleController.java)**
-    + **[CustController](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/controller/CustController.java)**
+    + **[SaleController](./src/main/java/com/lgy/projectfinal/controller/SaleController.java)**
+    + **[CustController](./src/main/java/com/lgy/projectfinal/controller/CustController.java)**
 
       : 주문 취소로 결제 금액을 반환합니다.
 
 
     + **Service**  
-       : SaleService.java - [SaleServiceImpl.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/service/SaleServiceImpl.java)의 구조를 가집니다.   
-       : CustService.java - [CustServiceImpl.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/service/CustServiceImpl.java)의 구조를 가집니다.
+       : SaleService.java - [SaleServiceImpl.java](./src/main/java/com/lgy/projectfinal/service/SaleServiceImpl.java)의 구조를 가집니다.   
+       : CustService.java - [CustServiceImpl.java](./src/main/java/com/lgy/projectfinal/service/CustServiceImpl.java)의 구조를 가집니다.
 
 
     + **Dao**   
-       : [SaleDao.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/SaleDao.java) - [SaleMapper.xml](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/mapper/SaleDao.xml)의 구조를 가집니다.  
-       : [CustDao.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/custDao.java) - [CustMapper.xml](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/mapper/custDao.xml)의 구조를 가집니다.   
+       : [SaleDao.java](./src/main/java/com/lgy/projectfinal/dao/SaleDao.java) - [SaleMapper.xml](./src/main/java/com/lgy/projectfinal/dao/mapper/SaleDao.xml)의 구조를 가집니다.  
+       : [CustDao.java](./src/main/java/com/lgy/projectfinal/dao/custDao.java) - [CustMapper.xml](./src/main/java/com/lgy/projectfinal/dao/mapper/custDao.xml)의 구조를 가집니다.   
 
   </details>
 
@@ -148,14 +148,14 @@
     **[ 상세 구조 ]**
     <img src = "https://github.com/sjlee05/LookLike/assets/136719054/3609c7e2-7555-4446-993c-96a5936e7a63.png" width ="900px"/>
 
-    + **[NoticeController](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/controller/NoticeController.java)**
+    + **[NoticeController](./src/main/java/com/lgy/projectfinal/controller/NoticeController.java)**
      : 이미지는 D:\dev\looklike 폴더에 저장합니다.
 
     + **NoticeService**   
-     : NoticeService.java - [NoticeServiceImpl.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/service/NoticeServiceImpl.java)의 구조를 가집니다.
+     : NoticeService.java - [NoticeServiceImpl.java](./src/main/java/com/lgy/projectfinal/service/NoticeServiceImpl.java)의 구조를 가집니다.
 
     + **NoticeDao**   
-     : [NoticeDao.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/NoticeDao.java) - [NoticeMapper.xml](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/mapper/NoticeDao.xml)의 구조를 가집니다.
+     : [NoticeDao.java](./src/main/java/com/lgy/projectfinal/dao/NoticeDao.java) - [NoticeMapper.xml](./src/main/java/com/lgy/projectfinal/dao/mapper/NoticeDao.xml)의 구조를 가집니다.
 
    </details>
 
@@ -180,14 +180,14 @@
     **[ 상세 구조 ]**
     <img src = "https://github.com/sjlee05/LookLike/assets/136719054/f7c4fb32-b4ef-44cd-af95-184946226fdc.png" width="900"/>
 
-    + **[ReviewController](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/controller/ReviewController.java)**
+    + **[ReviewController](./src/main/java/com/lgy/projectfinal/controller/ReviewController.java)**
      : 이미지는 D:\dev\looklike 폴더에 저장합니다.
 
     + **ReviewService**   
-     : ReviewService.java - [ReviewServiceImpl.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/service/ReviewServiceImpl.java)의 구조를 가집니다.
+     : ReviewService.java - [ReviewServiceImpl.java](./src/main/java/com/lgy/projectfinal/service/ReviewServiceImpl.java)의 구조를 가집니다.
 
     + **ReviewDao**   
-     : [ReviewDao.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/ReviewDao.java) - [ReviewMapper.xml](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/mapper/ReviewDao.xml)의 구조를 가집니다.
+     : [ReviewDao.java](./src/main/java/com/lgy/projectfinal/dao/ReviewDao.java) - [ReviewMapper.xml](./src/main/java/com/lgy/projectfinal/dao/mapper/ReviewDao.xml)의 구조를 가집니다.
 
    </details>
 
@@ -211,13 +211,13 @@
     **[ 상세 구조 ]**
     <img src = "https://github.com/sjlee05/LookLike/assets/136719054/3b254c1c-bb12-4a94-b2a4-91b7519a59b2.png" width="900"/>
 
-    + **[QnAController](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/controller/QnAController.java)**
+    + **[QnAController](./src/main/java/com/lgy/projectfinal/controller/QnAController.java)**
      : 이미지는 D:\dev\looklike 폴더에 저장합니다.
 
     + **QnAService**   
-     : QnAService.java - [QnAServiceImpl.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/service/QnAServiceImpl.java)의 구조를 가집니다.
+     : QnAService.java - [QnAServiceImpl.java](./src/main/java/com/lgy/projectfinal/service/QnAServiceImpl.java)의 구조를 가집니다.
 
     + **QnADao**   
-     : [QnADao.java](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/QnADao.java) - [QnAMapper.xml](./shoppingmall/projectfinal/src/main/java/com/lgy/projectfinal/dao/mapper/QnADao.xml)의 구조를 가집니다.
+     : [QnADao.java](./src/main/java/com/lgy/projectfinal/dao/QnADao.java) - [QnAMapper.xml](./src/main/java/com/lgy/projectfinal/dao/mapper/QnADao.xml)의 구조를 가집니다.
 
    </details>
