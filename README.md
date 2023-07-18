@@ -43,8 +43,9 @@
 <br>
 
 ## 4. 시연 영상
-
-
+<img src="https://github.com/sjlee05/LookLike/assets/136719054/80cde7ab-4d19-427a-bfa6-76f288c5e640.gif" width="800px"/>
+<br><br>
+<img src="https://github.com/sjlee05/LookLike/assets/136719054/6703929c-510a-4954-b661-3600d1b34bf5.gif" width="800px"/>
 
 <br>
 
